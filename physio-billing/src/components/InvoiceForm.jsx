@@ -1,656 +1,669 @@
-import { useEffect,useState } from "react"
+import { useEffect, useState } from "react"
 import InvoicePreview from "./InvoicePreview"
 import SignatureUpload from "./SignatureUpload"
 import generatePDF from "../utils/generatePDF"
+import Select from "react-select";
 
-const serviceTemplates=[
+const serviceTemplates = /*[
 
-"Physiotherapy Session",
-"Dry Needling",
-"Manual Therapy",
-"Electro Therapy",
-"Sports Rehab",
-"Post Surgery Rehab"
+    "Physiotherapy Session",
+    "Dry Needling",
+    "Manual Therapy",
+    "Electro Therapy",
+    "Sports Rehab",
+    "Post Surgery Rehab"
 
+]*/
+[
+  "Physiotherapy Consultation",
+  "Physiotherapy Session",
+  "Sports Physiotherapy",
+  "Orthopedic Physiotherapy",
+  "Neurological Physiotherapy",
+  "Pediatric Physiotherapy",
+  "Geriatric Physiotherapy",
+  "Women's Health Physiotherapy",
+  "Post Operative Rehabilitation",
+  "Post Fracture Rehabilitation",
+  "ACL Rehabilitation",
+  "Shoulder Rehabilitation",
+  "Spine Rehabilitation",
+  "Back Pain Treatment",
+  "Neck Pain Treatment",
+  "Knee Pain Treatment",
+  "Frozen Shoulder Treatment",
+  "Tennis Elbow Treatment",
+  "Plantar Fasciitis Treatment",
+  "Sciatica Treatment",
+  "Cervical Spondylosis Treatment",
+  "Lumbar Spondylosis Treatment",
+  "Electro Therapy",
+  "IFT Therapy",
+  "TENS Therapy",
+  "Ultrasound Therapy",
+  "Laser Therapy",
+  "Short Wave Diathermy",
+  "Wax Therapy",
+  "Traction Therapy",
+  "Dry Needling",
+  "Cupping Therapy",
+  "Manual Therapy",
+  "Myofascial Release",
+  "Trigger Point Release",
+  "Soft Tissue Mobilization",
+  "Joint Mobilization",
+  "Sports Massage",
+  "Kinesio Taping",
+  "Posture Correction",
+  "Balance Training",
+  "Gait Training",
+  "Strengthening Exercises",
+  "Stretching Exercises",
+  "Home Exercise Program"
 ]
+const serviceOptions = serviceTemplates.map(service => ({
+    value: service,
+    label: service
+}));
 
-function InvoiceForm(){
+function InvoiceForm() {
 
-const [invoiceNo,setInvoiceNo]=
-useState(295)
+    const [invoiceNo, setInvoiceNo] =
+        useState(295)
 
-const [signature,setSignature]=
-useState("")
+    const [signature, setSignature] =
+        useState("")
 
-const [history,setHistory]=
-useState([])
+    const [history, setHistory] =
+        useState([])
 
-const [formData,setFormData]=
-useState({
+    const [formData, setFormData] =
+        useState({
 
-name:"",
-gender:"Male",
-age:"",
-mobile:"",
-regNo:"",
-date:"",
-referredBy:"",
-diagnosis:"",
+            name: "",
+            gender: "Male",
+            age: "",
+            mobile: "",
+            regNo: "",
+            date: "",
+            referredBy: "",
+            diagnosis: "",
 
-items:[
+            items: [
 
-{
+                {
 
-visits:"",
-description:"",
-rate:""
+                    visits: "",
+                    description: "",
+                    rate: ""
 
-}
+                }
 
-],
+            ],
 
-gst:"0",
+            gst: "0",
 
-paymentMode:"Cash"
+            paymentMode: "Cash"
 
-})
+        })
 
-useEffect(()=>{
+    useEffect(() => {
 
-const savedInvoice=
+        const savedInvoice =
 
-localStorage.getItem(
-"invoiceNo"
-)
+            localStorage.getItem(
+                "invoiceNo"
+            )
 
-if(savedInvoice){
+        if (savedInvoice) {
 
-setInvoiceNo(
-Number(savedInvoice)
-)
+            setInvoiceNo(
+                Number(savedInvoice)
+            )
 
-}
+        }
 
-const savedSignature=
+        const savedSignature =
 
-localStorage.getItem(
-"signature"
-)
+            localStorage.getItem(
+                "signature"
+            )
 
-if(savedSignature){
+        if (savedSignature) {
 
-setSignature(
-savedSignature
-)
+            setSignature(
+                savedSignature
+            )
 
-}
+        }
 
-loadHistory()
+        loadHistory()
 
-},[])
+    }, [])
 
-function loadHistory(){
+    function loadHistory() {
 
-const invoices=
+        const invoices =
 
-JSON.parse(
+            JSON.parse(
 
-localStorage.getItem(
-"invoices"
-)||"[]"
+                localStorage.getItem(
+                    "invoices"
+                ) || "[]"
 
-)
+            )
 
-setHistory(
+        setHistory(
 
-[...invoices].reverse()
+            [...invoices].reverse()
 
-)
+        )
 
-}
+    }
 
-function handleChange(e){
+    function handleChange(e) {
 
-setFormData({
+        setFormData({
 
-...formData,
+            ...formData,
 
-[e.target.name]:
+            [e.target.name]:
 
-e.target.value
+                e.target.value
 
-})
+        })
 
-}
+    }
 
-function handleItemChange(
+    function handleItemChange(
 
-index,
-field,
-value
+        index,
+        field,
+        value
 
-){
+    ) {
 
-const updated=
+        const updated =
 
-[...formData.items]
+            [...formData.items]
 
-updated[index][field]=
-value
+        updated[index][field] =
+            value
 
-setFormData({
+        setFormData({
 
-...formData,
+            ...formData,
 
-items:updated
+            items: updated
 
-})
+        })
 
-}
+    }
 
-function addSession(){
+    function addSession() {
 
-setFormData({
+        setFormData({
 
-...formData,
+            ...formData,
 
-items:[
+            items: [
 
-...formData.items,
+                ...formData.items,
 
-{
+                {
 
-visits:"",
-description:"",
-rate:""
+                    visits: "",
+                    description: "",
+                    rate: ""
 
-}
+                }
 
-]
+            ]
 
-})
+        })
 
-}
+    }
 
-function removeSession(index){
+    function removeSession(index) {
 
-if(
+        if (
 
-formData.items.length===1
+            formData.items.length === 1
 
-)return
+        ) return
 
-const updated=
+        const updated =
 
-formData.items.filter(
+            formData.items.filter(
 
-(_,i)=>
+                (_, i) =>
 
-i!==index
+                    i !== index
 
-)
+            )
 
-setFormData({
+        setFormData({
 
-...formData,
+            ...formData,
 
-items:updated
+            items: updated
 
-})
+        })
 
-}
+    }
 
-function selectTemplate(service){
+    function selectTemplate(service) {
 
-const updated=
+        const updated =
 
-[...formData.items]
+            [...formData.items]
 
-updated[
-updated.length-1
-].description=
+        updated[
+            updated.length - 1
+        ].description =
 
-service
+            service
 
-setFormData({
+        setFormData({
 
-...formData,
+            ...formData,
 
-items:updated
+            items: updated
 
-})
+        })
 
-}
+    }
 
-function generateBill(){
+    function generateBill() {
 
-const subtotal=
+        const subtotal =
 
-formData.items.reduce(
+            formData.items.reduce(
 
-(sum,item)=>
+                (sum, item) =>
 
-sum+
+                    sum +
 
-(
+                    (
 
-(Number(
-item.visits
-)||0)
+                        (Number(
+                            item.visits
+                        ) || 0)
 
-*
+                        *
 
-(Number(
-item.rate
-)||0)
+                        (Number(
+                            item.rate
+                        ) || 0)
 
-),
+                    ),
 
-0
+                0
 
-)
+            )
 
-const gst=
+        const gst =
 
-(subtotal*
+            (subtotal *
 
-Number(
-formData.gst
-))/100
+                Number(
+                    formData.gst
+                )) / 100
 
-const total=
+        const total =
 
-subtotal+gst
+            subtotal + gst
 
-const invoiceId=
+        const invoiceId =
 
-`FIT-${invoiceNo}`
+            `FIT-${invoiceNo}`
 
-const invoices=
+        const invoices =
 
-JSON.parse(
+            JSON.parse(
 
-localStorage.getItem(
-"invoices"
-)||"[]"
+                localStorage.getItem(
+                    "invoices"
+                ) || "[]"
 
-)
+            )
 
-const newInvoice={
+        const newInvoice = {
 
-invoiceId,
+            invoiceId,
 
-customer:
-formData.name,
+            customer:
+                formData.name,
 
-mobile:
-formData.mobile,
+            mobile:
+                formData.mobile,
 
-regNo:
-formData.regNo,
+            regNo:
+                formData.regNo,
 
-date:
-formData.date,
+            date:
+                formData.date,
 
-items:
-formData.items,
+            items:
+                formData.items,
 
-total,
+            total,
 
-createdAt:
+            createdAt:
 
-Date.now()
+                Date.now()
 
-}
+        }
 
-invoices.push(
-newInvoice
-)
+        invoices.push(
+            newInvoice
+        )
 
-localStorage.setItem(
+        localStorage.setItem(
 
-"invoices",
+            "invoices",
 
-JSON.stringify(
-invoices
-)
+            JSON.stringify(
+                invoices
+            )
 
-)
+        )
 
-localStorage.setItem(
+        localStorage.setItem(
 
-"invoiceNo",
+            "invoiceNo",
 
-invoiceNo+1
+            invoiceNo + 1
 
-)
+        )
 
-setInvoiceNo(
+        setInvoiceNo(
 
-prev=>prev+1
+            prev => prev + 1
 
-)
+        )
 
-loadHistory()
+        loadHistory()
 
-alert(
+        alert(
 
-`${invoiceId}
+            `${invoiceId}
 Generated`
 
-)
+        )
 
-}
+    }
 
-return(
+    return (
 
-<div
-className="
+        <div
+            className="
 grid
 lg:grid-cols-2
 gap-8
 items-start
 "
->
+        >
 
-<div
-className="
+            <div
+                className="
 bg-white
 p-6
 rounded-xl
 shadow
 "
->
+            >
 
-<h2
-className="
+                <h2
+                    className="
 text-2xl
 font-bold
 mb-5
 "
->
+                >
 
-Customer Details
+                    Customer Details
 
-</h2>
+                </h2>
 
-<input
-name="name"
-placeholder="Customer Name"
-value={formData.name}
-onChange={handleChange}
-className="
+                <input
+                    name="name"
+                    placeholder="Customer Name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="
 border
 p-3
 w-full
 mb-3
 rounded
 "
-/>
+                />
 
-<div
-className="
+                <div
+                    className="
 grid
 grid-cols-2
 gap-3
 "
->
+                >
 
-<select
-name="gender"
-value={formData.gender}
-onChange={handleChange}
-className="
+                    <select
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleChange}
+                        className="
 border
 p-3
 rounded
 "
->
+                    >
 
-<option>Male</option>
-<option>Female</option>
-<option>Other</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
 
-</select>
+                    </select>
 
-<input
-name="age"
-placeholder="Age"
-value={formData.age}
-onChange={handleChange}
-className="
+                    <input
+                        name="age"
+                        placeholder="Age"
+                        value={formData.age}
+                        onChange={handleChange}
+                        className="
 border
 p-3
 rounded
 "
-/>
+                    />
 
-</div>
+                </div>
 
-<input
-name="mobile"
-placeholder="Mobile"
-value={formData.mobile}
-onChange={handleChange}
-className="
+                <input
+                    name="mobile"
+                    placeholder="Mobile"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    className="
 border
 p-3
 my-3
 rounded
 w-full
 "
-/>
+                />
 
 
 
-<input
-type="date"
-name="date"
-value={formData.date}
-onChange={handleChange}
-className="
+                <input
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleChange}
+                    className="
 border
 p-3
 mb-3
 rounded
 w-full
 "
-/>
+                />
 
-<input
-name="referredBy"
-placeholder="Referred By"
-value={formData.referredBy}
-onChange={handleChange}
-className="
+                <input
+                    name="referredBy"
+                    placeholder="Referred By"
+                    value={formData.referredBy}
+                    onChange={handleChange}
+                    className="
 border
 p-3
 mb-3
 rounded
 w-full
 "
-/>
+                />
 
-<textarea
-name="diagnosis"
-placeholder="Diagnosis"
-rows="3"
-value={formData.diagnosis}
-onChange={handleChange}
-className="
+                <textarea
+                    name="diagnosis"
+                    placeholder="Diagnosis"
+                    rows="3"
+                    value={formData.diagnosis}
+                    onChange={handleChange}
+                    className="
 border
 p-3
 rounded
 mb-3
 w-full
 "
-/>
+                />
 
-<select
+                <div className="mb-4">
+  <Select
+    options={serviceOptions}
+    placeholder="🔍 Search Treatment..."
+    isSearchable
+    isClearable
+    onChange={(selected) => {
+      if (!selected) return;
+      selectTemplate(selected.value);
+    }}
+  />
+</div>
 
-onChange={(e)=>{
+                {
 
-if(
-!e.target.value
-)return
+                    formData.items.map(
 
-selectTemplate(
-e.target.value
-)
+                        (item, index) => (
 
-}}
+                            <div
 
-className="
-border
-p-3
-rounded
-mb-3
-w-full
-"
+                                key={index}
 
->
-
-<option>
-
-Select Service
-
-</option>
-
-{
-
-serviceTemplates.map(
-
-(service)=>(
-
-<option
-key={service}
->
-
-{service}
-
-</option>
-
-)
-
-)
-
-}
-
-</select>
-
-{
-
-formData.items.map(
-
-(item,index)=>(
-
-<div
-
-key={index}
-
-className="
+                                className="
 grid
 grid-cols-4
 gap-2
 mb-3
 "
 
->
+                            >
 
-<input
-placeholder="Visits"
-value={item.visits}
-onChange={(e)=>
+                                <input
+                                    placeholder="Visits"
+                                    value={item.visits}
+                                    onChange={(e) =>
 
-handleItemChange(
+                                        handleItemChange(
 
-index,
-"visits",
-e.target.value
+                                            index,
+                                            "visits",
+                                            e.target.value
 
-)
+                                        )
 
-}
-className="
+                                    }
+                                    className="
 border
 p-3
 rounded
 "
-/>
+                                />
 
-<input
-placeholder="Description"
-value={item.description}
-onChange={(e)=>
+                                <input
+                                    placeholder="Description"
+                                    value={item.description}
+                                    onChange={(e) =>
 
-handleItemChange(
+                                        handleItemChange(
 
-index,
-"description",
-e.target.value
+                                            index,
+                                            "description",
+                                            e.target.value
 
-)
+                                        )
 
-}
-className="
+                                    }
+                                    className="
 border
 p-3
 rounded
 "
-/>
+                                />
 
-<input
-placeholder="Rate"
-value={item.rate}
-onChange={(e)=>
+                                <input
+                                    placeholder="Rate"
+                                    value={item.rate}
+                                    onChange={(e) =>
 
-handleItemChange(
+                                        handleItemChange(
 
-index,
-"rate",
-e.target.value
+                                            index,
+                                            "rate",
+                                            e.target.value
 
-)
+                                        )
 
-}
-className="
+                                    }
+                                    className="
 border
 p-3
 rounded
 "
-/>
+                                />
 
-<button
+                                <button
 
-onClick={()=>
+                                    onClick={() =>
 
-removeSession(index)
+                                        removeSession(index)
 
-}
+                                    }
 
-className="
+                                    className="
 bg-red-500
 text-white
 rounded
 "
 
->
+                                >
 
-X
+                                    X
 
-</button>
+                                </button>
 
-</div>
+                            </div>
 
-)
+                        )
 
-)
+                    )
 
-}
+                }
 
-<button
-onClick={addSession}
-className="
+                <button
+                    onClick={addSession}
+                    className="
 bg-gray-700
 text-white
 px-4
@@ -658,107 +671,107 @@ py-2
 rounded
 mb-3
 "
->
+                >
 
-+ Add Session
+                    + Add Session
 
-</button>
+                </button>
 
-<input
-name="gst"
-placeholder="GST %"
-value={formData.gst}
-onChange={handleChange}
-className="
+                <input
+                    name="gst"
+                    placeholder="GST %"
+                    value={formData.gst}
+                    onChange={handleChange}
+                    className="
 border
 p-3
 rounded
 mb-3
 w-full
 "
-/>
+                />
 
-<select
-name="paymentMode"
-value={formData.paymentMode}
-onChange={handleChange}
-className="
+                <select
+                    name="paymentMode"
+                    value={formData.paymentMode}
+                    onChange={handleChange}
+                    className="
 border
 p-3
 rounded
 w-full
 "
->
+                >
 
-<option>Cash</option>
-<option>UPI</option>
-<option>Card</option>
+                    <option>Cash</option>
+                    <option>UPI</option>
+                    <option>Card</option>
 
-</select>
+                </select>
 
-<div className="mt-5">
+                <div className="mt-5">
 
-<SignatureUpload
-setSignature={setSignature}
-/>
+                    <SignatureUpload
+                        setSignature={setSignature}
+                    />
 
-</div>
+                </div>
 
-<div
-className="
+                <div
+                    className="
 flex
 gap-3
 mt-5
 "
->
+                >
 
-<button
-onClick={generateBill}
-className="
+                    <button
+                        onClick={generateBill}
+                        className="
 bg-blue-600
 text-white
 flex-1
 py-3
 rounded
 "
->
+                    >
 
-Generate
+                        Generate
 
-</button>
+                    </button>
 
-<button
-onClick={generatePDF}
-className="
+                    <button
+                        onClick={generatePDF}
+                        className="
 bg-green-600
 text-white
 flex-1
 py-3
 rounded
 "
->
+                    >
 
-Save PDF
+                        Save PDF
 
-</button>
+                    </button>
 
-</div>
+                </div>
 
-</div>
+            </div>
 
-<InvoicePreview
+            <InvoicePreview
 
-invoiceNo={invoiceNo}
+                invoiceNo={invoiceNo}
 
-data={formData}
+                data={formData}
 
-signature={signature}
+                signature={signature}
 
-/>
+            />
 
-</div>
+        </div>
 
-)
+    )
 
 }
 
