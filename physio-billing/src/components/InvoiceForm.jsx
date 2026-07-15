@@ -14,53 +14,53 @@ const serviceTemplates = /*[
     "Post Surgery Rehab"
 
 ]*/
-[
-  "Physiotherapy Consultation",
-  "Physiotherapy Session",
-  "Sports Physiotherapy",
-  "Orthopedic Physiotherapy",
-  "Neurological Physiotherapy",
-  "Pediatric Physiotherapy",
-  "Geriatric Physiotherapy",
-  "Women's Health Physiotherapy",
-  "Post Operative Rehabilitation",
-  "Post Fracture Rehabilitation",
-  "ACL Rehabilitation",
-  "Shoulder Rehabilitation",
-  "Spine Rehabilitation",
-  "Back Pain Treatment",
-  "Neck Pain Treatment",
-  "Knee Pain Treatment",
-  "Frozen Shoulder Treatment",
-  "Tennis Elbow Treatment",
-  "Plantar Fasciitis Treatment",
-  "Sciatica Treatment",
-  "Cervical Spondylosis Treatment",
-  "Lumbar Spondylosis Treatment",
-  "Electro Therapy",
-  "IFT Therapy",
-  "TENS Therapy",
-  "Ultrasound Therapy",
-  "Laser Therapy",
-  "Short Wave Diathermy",
-  "Wax Therapy",
-  "Traction Therapy",
-  "Dry Needling",
-  "Cupping Therapy",
-  "Manual Therapy",
-  "Myofascial Release",
-  "Trigger Point Release",
-  "Soft Tissue Mobilization",
-  "Joint Mobilization",
-  "Sports Massage",
-  "Kinesio Taping",
-  "Posture Correction",
-  "Balance Training",
-  "Gait Training",
-  "Strengthening Exercises",
-  "Stretching Exercises",
-  "Home Exercise Program"
-]
+    [
+        "Physiotherapy Consultation",
+        "Physiotherapy Session",
+        "Sports Physiotherapy",
+        "Orthopedic Physiotherapy",
+        "Neurological Physiotherapy",
+        "Pediatric Physiotherapy",
+        "Geriatric Physiotherapy",
+        "Women's Health Physiotherapy",
+        "Post Operative Rehabilitation",
+        "Post Fracture Rehabilitation",
+        "ACL Rehabilitation",
+        "Shoulder Rehabilitation",
+        "Spine Rehabilitation",
+        "Back Pain Treatment",
+        "Neck Pain Treatment",
+        "Knee Pain Treatment",
+        "Frozen Shoulder Treatment",
+        "Tennis Elbow Treatment",
+        "Plantar Fasciitis Treatment",
+        "Sciatica Treatment",
+        "Cervical Spondylosis Treatment",
+        "Lumbar Spondylosis Treatment",
+        "Electro Therapy",
+        "IFT Therapy",
+        "TENS Therapy",
+        "Ultrasound Therapy",
+        "Laser Therapy",
+        "Short Wave Diathermy",
+        "Wax Therapy",
+        "Traction Therapy",
+        "Dry Needling",
+        "Cupping Therapy",
+        "Manual Therapy",
+        "Myofascial Release",
+        "Trigger Point Release",
+        "Soft Tissue Mobilization",
+        "Joint Mobilization",
+        "Sports Massage",
+        "Kinesio Taping",
+        "Posture Correction",
+        "Balance Training",
+        "Gait Training",
+        "Strengthening Exercises",
+        "Stretching Exercises",
+        "Home Exercise Program"
+    ]
 const serviceOptions = serviceTemplates.map(service => ({
     value: service,
     label: service
@@ -467,9 +467,20 @@ rounded
 
                     <input
                         name="age"
+                        type="text"
+                        inputMode="numeric"
                         placeholder="Age"
                         value={formData.age}
-                        onChange={handleChange}
+                        onChange={(e) => {
+                            const value = e.target.value
+                                .replace(/\D/g, "")
+                                .slice(0, 3);
+
+                            setFormData({
+                                ...formData,
+                                age: value,
+                            });
+                        }}
                         className="
 border
 p-3
@@ -481,9 +492,22 @@ rounded
 
                 <input
                     name="mobile"
-                    placeholder="Mobile"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="Mobile Number"
                     value={formData.mobile}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                        const value = e.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 10);
+
+                        setFormData({
+                            ...formData,
+                            mobile: value,
+                        });
+                    }}
+                    minLength={10}
+                    maxLength={10}
                     className="
 border
 p-3
@@ -539,17 +563,17 @@ w-full
                 />
 
                 <div className="mb-4">
-  <Select
-    options={serviceOptions}
-    placeholder="🔍 Search Treatment..."
-    isSearchable
-    isClearable
-    onChange={(selected) => {
-      if (!selected) return;
-      selectTemplate(selected.value);
-    }}
-  />
-</div>
+                    <Select
+                        options={serviceOptions}
+                        placeholder="🔍 Search Treatment..."
+                        isSearchable
+                        isClearable
+                        onChange={(selected) => {
+                            if (!selected) return;
+                            selectTemplate(selected.value);
+                        }}
+                    />
+                </div>
 
                 {
 
