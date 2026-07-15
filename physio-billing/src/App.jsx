@@ -1,30 +1,45 @@
-import InvoiceForm from "./components/InvoiceForm"
+import { Routes, Route } from "react-router-dom";
 
-function App(){
+import Login from "./pages/Login";
+import Home from "./pages/Home";
+import Billing from "./pages/Billing";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-return(
+export default function App() {
+  return (
+    <Routes>
 
-<div className="min-h-screen bg-gray-100 p-6">
+      <Route path="/login" element={<Login />} />
 
-<h1
-className="
-text-3xl
-font-bold
-text-center
-mb-6
-"
->
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
 
-FIT PHYSIO THERAPY
+      <Route
+        path="/billing"
+        element={
+          <ProtectedRoute>
+            <Billing />
+          </ProtectedRoute>
+        }
+      />
 
-</h1>
+      <Route
+        path="/patients"
+        element={
+          <ProtectedRoute>
+            <div className="min-h-screen flex items-center justify-center text-3xl font-bold">
+              Patients Module (Coming Soon)
+            </div>
+          </ProtectedRoute>
+        }
+      />
 
-<InvoiceForm/>
-
-</div>
-
-)
-
+    </Routes>
+  );
 }
-
-export default App
