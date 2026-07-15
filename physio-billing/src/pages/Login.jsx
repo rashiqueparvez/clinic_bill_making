@@ -23,7 +23,7 @@ export default function Login() {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://clinic-bill-making.onrender.com/api/auth/login",
         {
           username,
           password,
