@@ -1,104 +1,161 @@
-import jsPDF from "jspdf"
-import html2canvas from "html2canvas"
+
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const generatePDF = async () => {
+  const invoice = document.getElementById("invoice");
 
-const invoice =
-document.getElementById("invoice")
+  if (!invoice) {
+    alert("Invoice not found");
+    return;
+  }
 
-if(!invoice){
+  try {
+    // Save original background
+    const originalBg = invoice.style.backgroundColor;
 
-alert("Invoice not found")
+    // Force white background for PDF
+    invoice.style.backgroundColor = "#ffffff";
 
-return
+    const canvas = await html2canvas(invoice, {
+      // Reduced from 2 to 1.5 to reduce PDF size
+      scale: 1.5,
 
-}
+      useCORS: true,
 
-try{
+      allowTaint: false,
 
-const originalBg =
-invoice.style.backgroundColor
+      backgroundColor: "#ffffff",
 
-invoice.style.backgroundColor="#ffffff"
+      logging: false,
 
-const canvas =
-await html2canvas(
+      imageTimeout: 15000,
+    });
 
-invoice,
+    // Restore original background
+    invoice.style.backgroundColor = originalBg;
 
-{
+    /*
+     * JPEG instead of PNG.
+     *
+     * PNG creates very large PDF files because the entire
+     * invoice screenshot is stored losslessly.
+     *
+     * JPEG compression dramatically reduces the file size.
+     */
+    const qualityLevels = [0.75, 0.65, 0.55, 0.45, 0.35];
 
-scale:2,
+    let pdfBlob = null;
 
-useCORS:true,
+    for (const quality of qualityLevels) {
+      // Convert canvas to compressed JPEG
+      const imgData = canvas.toDataURL(
+        "image/jpeg",
+        quality
+      );
 
-backgroundColor:"#ffffff",
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+        compress: true,
+      });
 
-logging:false
+      const pdfWidth = 210;
+      const pdfHeight = 297;
 
-}
+      // Small margins
+      const margin = 5;
 
-)
+      const availableWidth = pdfWidth - margin * 2;
+      const availableHeight = pdfHeight - margin * 2;
 
-invoice.style.backgroundColor=
-originalBg
+      // Maintain original aspect ratio
+      const canvasRatio = canvas.width / canvas.height;
 
-const imgData =
-canvas.toDataURL("image/png")
+      let imgWidth = availableWidth;
+      let imgHeight = imgWidth / canvasRatio;
 
-const pdf =
-new jsPDF({
+      // Make sure invoice fits completely on A4
+      if (imgHeight > availableHeight) {
+        imgHeight = availableHeight;
+        imgWidth = imgHeight * canvasRatio;
+      }
 
-orientation:"portrait",
+      // Center invoice on A4
+      const x = (pdfWidth - imgWidth) / 2;
+      const y = (pdfHeight - imgHeight) / 2;
 
-unit:"mm",
+      pdf.addImage(
+        imgData,
+        "JPEG",
+        x,
+        y,
+        imgWidth,
+        imgHeight,
+        undefined,
+        "FAST"
+      );
 
-format:"a4"
+      // Create PDF blob so we can check its size
+      pdfBlob = pdf.output("blob");
 
-})
+      const sizeMB =
+        pdfBlob.size / (1024 * 1024);
 
-const pdfWidth=210
+      console.log(
+        `PDF quality: ${quality} | Size: ${sizeMB.toFixed(2)} MB`
+      );
 
-const pdfHeight=
-(canvas.height*pdfWidth)
-/canvas.width
+      /*
+       * Target:
+       * Less than 3.5 MB.
+       *
+       * This gives us a safety margin below your
+       * 4 MB requirement.
+       */
+      if (sizeMB < 3.5) {
+        break;
+      }
+    }
 
-pdf.addImage(
+    if (!pdfBlob) {
+      throw new Error("PDF generation failed");
+    }
 
-imgData,
+    // Create download URL
+    const url = URL.createObjectURL(pdfBlob);
 
-"PNG",
+    const link = document.createElement("a");
 
-0,
+    link.href = url;
 
-0,
+    link.download = `Invoice-${invoice.id}.pdf`;
 
-pdfWidth,
+    document.body.appendChild(link);
 
-pdfHeight
+    link.click();
 
-)
+    document.body.removeChild(link);
 
-pdf.save(
+    // Free browser memory
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 1000);
 
-`Invoice-${invoice.id}.pdf`
+    console.log(
+      `Final PDF size: ${(pdfBlob.size / (1024 * 1024)).toFixed(2)} MB`
+    );
 
-)
+  } catch (error) {
+    console.error("PDF generation failed:", error);
 
-}
+    // Make sure background is restored even if an error occurs
+    invoice.style.backgroundColor = "";
 
-catch(error){
+    alert("PDF generation failed");
+  }
+};
 
-console.log(error)
+export default generatePDF;
 
-alert(
-
-"PDF generation failed"
-
-)
-
-}
-
-}
-
-export default generatePDF

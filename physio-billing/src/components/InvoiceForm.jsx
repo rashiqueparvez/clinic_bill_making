@@ -1,401 +1,235 @@
-import { useEffect, useState } from "react"
-import InvoicePreview from "./InvoicePreview"
-import SignatureUpload from "./SignatureUpload"
-import generatePDF from "../utils/generatePDF"
+
+import { useEffect, useState } from "react";
+import InvoicePreview from "./InvoicePreview";
+import SignatureUpload from "./SignatureUpload";
+import generatePDF from "../utils/generatePDF";
 import Select from "react-select";
 
-const serviceTemplates = /*[
-
+const serviceTemplates = [
+    "Physiotherapy Consultation",
     "Physiotherapy Session",
-    "Dry Needling",
-    "Manual Therapy",
+    "Sports Physiotherapy",
+    "Orthopedic Physiotherapy",
+    "Neurological Physiotherapy",
+    "Pediatric Physiotherapy",
+    "Geriatric Physiotherapy",
+    "Women's Health Physiotherapy",
+    "Post Operative Rehabilitation",
+    "Post Fracture Rehabilitation",
+    "ACL Rehabilitation",
+    "Shoulder Rehabilitation",
+    "Spine Rehabilitation",
+    "Back Pain Treatment",
+    "Neck Pain Treatment",
+    "Knee Pain Treatment",
+    "Frozen Shoulder Treatment",
+    "Tennis Elbow Treatment",
+    "Plantar Fasciitis Treatment",
+    "Sciatica Treatment",
+    "Cervical Spondylosis Treatment",
+    "Lumbar Spondylosis Treatment",
     "Electro Therapy",
-    "Sports Rehab",
-    "Post Surgery Rehab"
+    "IFT Therapy",
+    "TENS Therapy",
+    "Ultrasound Therapy",
+    "Laser Therapy",
+    "Short Wave Diathermy",
+    "Wax Therapy",
+    "Traction Therapy",
+    "Dry Needling",
+    "Cupping Therapy",
+    "Manual Therapy",
+    "Myofascial Release",
+    "Trigger Point Release",
+    "Soft Tissue Mobilization",
+    "Joint Mobilization",
+    "Sports Massage",
+    "Kinesio Taping",
+    "Posture Correction",
+    "Balance Training",
+    "Gait Training",
+    "Strengthening Exercises",
+    "Stretching Exercises",
+    "Home Exercise Program",
+];
 
-]*/
-    [
-        "Physiotherapy Consultation",
-        "Physiotherapy Session",
-        "Sports Physiotherapy",
-        "Orthopedic Physiotherapy",
-        "Neurological Physiotherapy",
-        "Pediatric Physiotherapy",
-        "Geriatric Physiotherapy",
-        "Women's Health Physiotherapy",
-        "Post Operative Rehabilitation",
-        "Post Fracture Rehabilitation",
-        "ACL Rehabilitation",
-        "Shoulder Rehabilitation",
-        "Spine Rehabilitation",
-        "Back Pain Treatment",
-        "Neck Pain Treatment",
-        "Knee Pain Treatment",
-        "Frozen Shoulder Treatment",
-        "Tennis Elbow Treatment",
-        "Plantar Fasciitis Treatment",
-        "Sciatica Treatment",
-        "Cervical Spondylosis Treatment",
-        "Lumbar Spondylosis Treatment",
-        "Electro Therapy",
-        "IFT Therapy",
-        "TENS Therapy",
-        "Ultrasound Therapy",
-        "Laser Therapy",
-        "Short Wave Diathermy",
-        "Wax Therapy",
-        "Traction Therapy",
-        "Dry Needling",
-        "Cupping Therapy",
-        "Manual Therapy",
-        "Myofascial Release",
-        "Trigger Point Release",
-        "Soft Tissue Mobilization",
-        "Joint Mobilization",
-        "Sports Massage",
-        "Kinesio Taping",
-        "Posture Correction",
-        "Balance Training",
-        "Gait Training",
-        "Strengthening Exercises",
-        "Stretching Exercises",
-        "Home Exercise Program"
-    ]
-const serviceOptions = serviceTemplates.map(service => ({
+const serviceOptions = serviceTemplates.map((service) => ({
     value: service,
-    label: service
+    label: service,
 }));
 
 function InvoiceForm() {
+    const [invoiceNo, setInvoiceNo] = useState(295);
 
-    const [invoiceNo, setInvoiceNo] =
-        useState(295)
+    const [signature, setSignature] = useState("");
 
-    const [signature, setSignature] =
-        useState("")
+    const [history, setHistory] = useState([]);
 
-    const [history, setHistory] =
-        useState([])
+    const [formData, setFormData] = useState({
+        name: "",
+        gender: "Male",
+        age: "",
+        mobile: "",
 
-    const [formData, setFormData] =
-        useState({
+        // Registration Number
+        regNo: "",
 
-            name: "",
-            gender: "Male",
-            age: "",
-            mobile: "",
-            regNo: "",
-            date: "",
-            referredBy: "",
-            diagnosis: "",
+        date: "",
+        referredBy: "",
+        diagnosis: "",
 
-            items: [
+        items: [
+            {
+                visits: "",
+                description: "",
+                rate: "",
+            },
+        ],
 
-                {
+        gst: "0",
 
-                    visits: "",
-                    description: "",
-                    rate: ""
-
-                }
-
-            ],
-
-            gst: "0",
-
-            paymentMode: "Cash"
-
-        })
+        paymentMode: "Cash",
+    });
 
     useEffect(() => {
-
-        const savedInvoice =
-
-            localStorage.getItem(
-                "invoiceNo"
-            )
+        const savedInvoice = localStorage.getItem("invoiceNo");
 
         if (savedInvoice) {
-
-            setInvoiceNo(
-                Number(savedInvoice)
-            )
-
+            setInvoiceNo(Number(savedInvoice));
         }
 
-        const savedSignature =
-
-            localStorage.getItem(
-                "signature"
-            )
+        const savedSignature = localStorage.getItem("signature");
 
         if (savedSignature) {
-
-            setSignature(
-                savedSignature
-            )
-
+            setSignature(savedSignature);
         }
 
-        loadHistory()
-
-    }, [])
+        loadHistory();
+    }, []);
 
     function loadHistory() {
+        const invoices = JSON.parse(
+            localStorage.getItem("invoices") || "[]"
+        );
 
-        const invoices =
-
-            JSON.parse(
-
-                localStorage.getItem(
-                    "invoices"
-                ) || "[]"
-
-            )
-
-        setHistory(
-
-            [...invoices].reverse()
-
-        )
-
+        setHistory([...invoices].reverse());
     }
 
     function handleChange(e) {
-
         setFormData({
-
             ...formData,
-
-            [e.target.name]:
-
-                e.target.value
-
-        })
-
+            [e.target.name]: e.target.value,
+        });
     }
 
-    function handleItemChange(
+    function handleItemChange(index, field, value) {
+        const updated = [...formData.items];
 
-        index,
-        field,
-        value
-
-    ) {
-
-        const updated =
-
-            [...formData.items]
-
-        updated[index][field] =
-            value
+        updated[index][field] = value;
 
         setFormData({
-
             ...formData,
-
-            items: updated
-
-        })
-
+            items: updated,
+        });
     }
 
     function addSession() {
-
         setFormData({
-
             ...formData,
-
             items: [
-
                 ...formData.items,
-
                 {
-
                     visits: "",
                     description: "",
-                    rate: ""
-
-                }
-
-            ]
-
-        })
-
+                    rate: "",
+                },
+            ],
+        });
     }
 
     function removeSession(index) {
+        if (formData.items.length === 1) return;
 
-        if (
-
-            formData.items.length === 1
-
-        ) return
-
-        const updated =
-
-            formData.items.filter(
-
-                (_, i) =>
-
-                    i !== index
-
-            )
+        const updated = formData.items.filter(
+            (_, i) => i !== index
+        );
 
         setFormData({
-
             ...formData,
-
-            items: updated
-
-        })
-
+            items: updated,
+        });
     }
 
     function selectTemplate(service) {
+        const updated = [...formData.items];
 
-        const updated =
-
-            [...formData.items]
-
-        updated[
-            updated.length - 1
-        ].description =
-
-            service
+        updated[updated.length - 1].description = service;
 
         setFormData({
-
             ...formData,
-
-            items: updated
-
-        })
-
+            items: updated,
+        });
     }
 
     function generateBill() {
-
-        const subtotal =
-
-            formData.items.reduce(
-
-                (sum, item) =>
-
-                    sum +
-
-                    (
-
-                        (Number(
-                            item.visits
-                        ) || 0)
-
-                        *
-
-                        (Number(
-                            item.rate
-                        ) || 0)
-
-                    ),
-
-                0
-
-            )
+        const subtotal = formData.items.reduce(
+            (sum, item) =>
+                sum +
+                (Number(item.visits) || 0) *
+                (Number(item.rate) || 0),
+            0
+        );
 
         const gst =
+            (subtotal * Number(formData.gst)) / 100;
 
-            (subtotal *
+        const total = subtotal + gst;
 
-                Number(
-                    formData.gst
-                )) / 100
+        const invoiceId = `FIT-${invoiceNo}`;
 
-        const total =
-
-            subtotal + gst
-
-        const invoiceId =
-
-            `FIT-${invoiceNo}`
-
-        const invoices =
-
-            JSON.parse(
-
-                localStorage.getItem(
-                    "invoices"
-                ) || "[]"
-
-            )
+        const invoices = JSON.parse(
+            localStorage.getItem("invoices") || "[]"
+        );
 
         const newInvoice = {
-
             invoiceId,
 
-            customer:
-                formData.name,
+            customer: formData.name,
 
-            mobile:
-                formData.mobile,
+            mobile: formData.mobile,
 
-            regNo:
-                formData.regNo,
+            // Registration Number
+            regNo: formData.regNo,
 
-            date:
-                formData.date,
+            date: formData.date,
 
-            items:
-                formData.items,
+            items: formData.items,
 
             total,
 
-            createdAt:
+            createdAt: Date.now(),
+        };
 
-                Date.now()
-
-        }
-
-        invoices.push(
-            newInvoice
-        )
+        invoices.push(newInvoice);
 
         localStorage.setItem(
-
             "invoices",
-
-            JSON.stringify(
-                invoices
-            )
-
-        )
+            JSON.stringify(invoices)
+        );
 
         localStorage.setItem(
-
             "invoiceNo",
-
             invoiceNo + 1
+        );
 
-        )
+        setInvoiceNo((prev) => prev + 1);
 
-        setInvoiceNo(
+        loadHistory();
 
-            prev => prev + 1
-
-        )
-
-        loadHistory()
-
-        alert(
-
-            `${invoiceId}
-Generated`
-
-        )
-
+        alert(`${invoiceId}\nGenerated`);
     }
 
     return (
-
         <div
             className="
 grid
@@ -404,6 +238,9 @@ gap-8
 items-start
 "
         >
+            {/* =========================
+                LEFT SIDE - FORM
+            ========================= */}
 
             <div
                 className="
@@ -413,7 +250,6 @@ rounded-xl
 shadow
 "
             >
-
                 <h2
                     className="
 text-2xl
@@ -421,10 +257,10 @@ font-bold
 mb-5
 "
                 >
-
                     Customer Details
-
                 </h2>
+
+                {/* Customer Name */}
 
                 <input
                     name="name"
@@ -440,6 +276,8 @@ rounded
 "
                 />
 
+                {/* Gender + Age */}
+
                 <div
                     className="
 grid
@@ -447,7 +285,6 @@ grid-cols-2
 gap-3
 "
                 >
-
                     <select
                         name="gender"
                         value={formData.gender}
@@ -458,11 +295,9 @@ p-3
 rounded
 "
                     >
-
                         <option>Male</option>
                         <option>Female</option>
                         <option>Other</option>
-
                     </select>
 
                     <input
@@ -472,9 +307,10 @@ rounded
                         placeholder="Age"
                         value={formData.age}
                         onChange={(e) => {
-                            const value = e.target.value
-                                .replace(/\D/g, "")
-                                .slice(0, 3);
+                            const value =
+                                e.target.value
+                                    .replace(/\D/g, "")
+                                    .slice(0, 3);
 
                             setFormData({
                                 ...formData,
@@ -487,8 +323,9 @@ p-3
 rounded
 "
                     />
-
                 </div>
+
+                {/* Mobile Number */}
 
                 <input
                     name="mobile"
@@ -497,9 +334,10 @@ rounded
                     placeholder="Mobile Number"
                     value={formData.mobile}
                     onChange={(e) => {
-                        const value = e.target.value
-                            .replace(/\D/g, "")
-                            .slice(0, 10);
+                        const value =
+                            e.target.value
+                                .replace(/\D/g, "")
+                                .slice(0, 10);
 
                         setFormData({
                             ...formData,
@@ -517,7 +355,24 @@ w-full
 "
                 />
 
+                {/* Registration Number */}
 
+                <input
+                    name="regNo"
+                    type="text"
+                    placeholder="Registration Number"
+                    value={formData.regNo}
+                    onChange={handleChange}
+                    className="
+border
+p-3
+mb-3
+rounded
+w-full
+"
+                />
+
+                {/* Date */}
 
                 <input
                     type="date"
@@ -533,6 +388,8 @@ w-full
 "
                 />
 
+                {/* Referred By */}
+
                 <input
                     name="referredBy"
                     placeholder="Referred By"
@@ -546,6 +403,8 @@ rounded
 w-full
 "
                 />
+
+                {/* Diagnosis */}
 
                 <textarea
                     name="diagnosis"
@@ -562,6 +421,8 @@ w-full
 "
                 />
 
+                {/* Treatment Search */}
+
                 <div className="mb-4">
                     <Select
                         options={serviceOptions}
@@ -570,120 +431,99 @@ w-full
                         isClearable
                         onChange={(selected) => {
                             if (!selected) return;
-                            selectTemplate(selected.value);
+
+                            selectTemplate(
+                                selected.value
+                            );
                         }}
                     />
                 </div>
 
-                {
+                {/* Treatment Items */}
 
-                    formData.items.map(
-
-                        (item, index) => (
-
-                            <div
-
-                                key={index}
-
-                                className="
+                {formData.items.map(
+                    (item, index) => (
+                        <div
+                            key={index}
+                            className="
 grid
 grid-cols-4
 gap-2
 mb-3
 "
-
-                            >
-
-                                <input
-                                    placeholder="Visits"
-                                    value={item.visits}
-                                    onChange={(e) =>
-
-                                        handleItemChange(
-
-                                            index,
-                                            "visits",
-                                            e.target.value
-
-                                        )
-
-                                    }
-                                    className="
+                        >
+                            <input
+                                placeholder="Visits"
+                                value={item.visits}
+                                onChange={(e) =>
+                                    handleItemChange(
+                                        index,
+                                        "visits",
+                                        e.target.value
+                                    )
+                                }
+                                className="
 border
 p-3
 rounded
 "
-                                />
+                            />
 
-                                <input
-                                    placeholder="Description"
-                                    value={item.description}
-                                    onChange={(e) =>
-
-                                        handleItemChange(
-
-                                            index,
-                                            "description",
-                                            e.target.value
-
-                                        )
-
-                                    }
-                                    className="
+                            <input
+                                placeholder="Description"
+                                value={
+                                    item.description
+                                }
+                                onChange={(e) =>
+                                    handleItemChange(
+                                        index,
+                                        "description",
+                                        e.target.value
+                                    )
+                                }
+                                className="
 border
 p-3
 rounded
 "
-                                />
+                            />
 
-                                <input
-                                    placeholder="Rate"
-                                    value={item.rate}
-                                    onChange={(e) =>
-
-                                        handleItemChange(
-
-                                            index,
-                                            "rate",
-                                            e.target.value
-
-                                        )
-
-                                    }
-                                    className="
+                            <input
+                                placeholder="Rate"
+                                value={item.rate}
+                                onChange={(e) =>
+                                    handleItemChange(
+                                        index,
+                                        "rate",
+                                        e.target.value
+                                    )
+                                }
+                                className="
 border
 p-3
 rounded
 "
-                                />
+                            />
 
-                                <button
-
-                                    onClick={() =>
-
-                                        removeSession(index)
-
-                                    }
-
-                                    className="
+                            <button
+                                onClick={() =>
+                                    removeSession(
+                                        index
+                                    )
+                                }
+                                className="
 bg-red-500
 text-white
 rounded
 "
-
-                                >
-
-                                    X
-
-                                </button>
-
-                            </div>
-
-                        )
-
+                            >
+                                X
+                            </button>
+                        </div>
                     )
+                )}
 
-                }
+                {/* Add Session */}
 
                 <button
                     onClick={addSession}
@@ -696,10 +536,10 @@ rounded
 mb-3
 "
                 >
-
                     + Add Session
-
                 </button>
+
+                {/* GST */}
 
                 <input
                     name="gst"
@@ -715,9 +555,13 @@ w-full
 "
                 />
 
+                {/* Payment Mode */}
+
                 <select
                     name="paymentMode"
-                    value={formData.paymentMode}
+                    value={
+                        formData.paymentMode
+                    }
                     onChange={handleChange}
                     className="
 border
@@ -726,20 +570,22 @@ rounded
 w-full
 "
                 >
-
                     <option>Cash</option>
                     <option>UPI</option>
                     <option>Card</option>
-
                 </select>
 
+                {/* Signature */}
+
                 <div className="mt-5">
-
                     <SignatureUpload
-                        setSignature={setSignature}
+                        setSignature={
+                            setSignature
+                        }
                     />
-
                 </div>
+
+                {/* Buttons */}
 
                 <div
                     className="
@@ -748,7 +594,6 @@ gap-3
 mt-5
 "
                 >
-
                     <button
                         onClick={generateBill}
                         className="
@@ -759,9 +604,7 @@ py-3
 rounded
 "
                     >
-
                         Generate
-
                     </button>
 
                     <button
@@ -774,29 +617,23 @@ py-3
 rounded
 "
                     >
-
                         Save PDF
-
                     </button>
-
                 </div>
-
             </div>
 
+            {/* =========================
+                RIGHT SIDE - INVOICE
+            ========================= */}
+
             <InvoicePreview
-
                 invoiceNo={invoiceNo}
-
                 data={formData}
-
                 signature={signature}
-
             />
-
         </div>
-
-    )
-
+    );
 }
 
-export default InvoiceForm
+export default InvoiceForm;
+
