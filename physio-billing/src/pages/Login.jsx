@@ -45,7 +45,7 @@ export default function Login() {
       setLoading(true);
 
      const res = await axios.post(
-    `${import.meta.env.VITE_API_URL}/api/auth/login`,
+    `https://clinic-bill-making2.onrender.com/api/auth/login`,
     {
         username,
         password,
