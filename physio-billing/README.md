@@ -1,16 +1,52 @@
-# React + Vite
+# 🏥 FIT Physio Therapy — Clinic Billing System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive clinic billing and invoice management web application built for **FIT Physio Therapy**.
 
-Currently, two official plugins are available:
+The system allows clinic staff to create professional invoices, manage patient and treatment details, calculate GST, upload authorized signatures, preview invoices in real time, and generate downloadable A4 PDF invoices.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🧾 Invoice Management
 
-## Expanding the ESLint configuration
+- Create professional clinic invoices
+- Automatic invoice numbering
+- Patient information management
+- Registration number support
+- Treatment and therapy selection
+- Multiple treatment sessions per invoice
+- Visits × rate automatic calculation
+- Automatic subtotal calculation
+- GST calculation
+- Grand total calculation
+- Payment mode selection
+- Invoice preview before generating PDF
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 👤 Patient Details
+
+The invoice supports:
+
+- Patient name
+- Gender
+- Age
+- Mobile number
+- Registration number
+- Referred by
+- Diagnosis / clinical notes
+
+### 🏥 Treatment Management
+
+The billing system supports multiple treatment entries in a single invoice.
+
+Each treatment can contain:
+
+- Number of visits
+- Treatment description
+- Rate per visit
+- Automatically calculated amount
+
+Example:
+
+```text
+Visits × Rate = Amount
